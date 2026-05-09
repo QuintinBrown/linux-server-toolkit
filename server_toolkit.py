@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from core.main import main
+from server_toolkit_app.main import main
 
 if __name__=="__main__":
     main()

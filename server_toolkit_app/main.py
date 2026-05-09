@@ -1,4 +1,4 @@
-from core.plugin_loader import load_plugins
+from server_toolkit_app.plugin_loader import load_plugins
 
 import argparse
 import subprocess

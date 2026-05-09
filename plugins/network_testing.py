@@ -1,7 +1,7 @@
 import subprocess
 import re
 
-from core.base_plugin import BasePlugin
+from server_toolkit_app.base_plugin import BasePlugin
 
 class Plugin(BasePlugin):
     name = "Network Testing"
