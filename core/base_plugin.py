@@ -1,3 +1,5 @@
+# abstract plugin method
+
 from abc import ABC, abstractmethod
 
 class BasePlugin(ABC):

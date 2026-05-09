@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from core.plugin_loader import load_plugins
 
 import argparse
@@ -26,6 +24,7 @@ def plugin_menu(plugin):
     while True:
         print(f"[{plugin.name}]")
 
+        # print commands belonging to the plugin with index starting at 1
         for idx, (command_name, _) in enumerate(command_items, start=1):
             print(f"{idx}. {command_name}")
         print("b. Back to plugin selection")
@@ -54,6 +53,7 @@ def plugin_menu(plugin):
 
         command_name, command_func = command_items[command_index]
 
+        # clears and runs the command, checks the return result and prints it
         clear()
         print(f"Running: {command_name}")
 
@@ -71,6 +71,7 @@ def start_CLI():
     while True:
         print("Available plugins")
 
+        # Print list of plugins in order with index starting at 1
         for idx, plugin in enumerate(plugins, start=1):
             print(f"{idx}. {plugin.name}")
 
@@ -94,7 +95,7 @@ def start_CLI():
             continue
 
         selected_plugin = plugins[plugin_index]
-        plugin_menu(selected_plugin)
+        plugin_menu(selected_plugin) # run the plugin menu for the selected plugin
 
 def start_TUI():
     print("TODO: TUI")
