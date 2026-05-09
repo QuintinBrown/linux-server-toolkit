@@ -12,7 +12,8 @@ class Plugin(BasePlugin):
             "Remote Ping": self.ping_remote,
             "Ping DNS": self.ping_dns,
             "Test DNS": self.test_dns,
-            "Find Gateway": self.find_gateway
+            "Find Gateway": self.find_gateway,
+            "Find DNS": self.find_dns
         }
     
     def run(self, cmd):
@@ -26,6 +27,15 @@ class Plugin(BasePlugin):
             print(pretty_result.group(1))
         else:
             return pretty_result.group(1)
+        
+    def find_dns(self, want_printed=True):
+        result = self.run("resolvectl status")
+        DNS_server = re.search(r'\bCurrent DNS Server:\s([0-9]+.[0-9]+.[0-9]+.[0-9]+)', result)
+
+        if want_printed:
+            print(DNS_server.group(1))
+        else:
+            return DNS_server.group(1)
     
     def ping_gateway(self):
         gw = self.find_gateway(False)
