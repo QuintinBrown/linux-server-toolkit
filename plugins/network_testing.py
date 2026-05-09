@@ -52,7 +52,15 @@ class Plugin(BasePlugin):
         print("TODO: Ping Remote")
 
     def ping_dns(self):
-        print("TODO: Ping DNS")
+        dns = self.find_dns(False)
+        print("Pinging DNS server...")
+        command_result = self.run(f"ping {dns} -c 5")
+        sent_search = re.search(r'([0-9])\b\spackets', command_result)
+        succeeded_search = re.search(r'([0-9])\b\sreceived', command_result)
+        sent = sent_search.group(1)
+        succeeded = succeeded_search.group(1)
+
+        print(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def test_dns(self):
         print("TODO: Test DNS")
