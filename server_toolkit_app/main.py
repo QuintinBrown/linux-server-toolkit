@@ -117,6 +117,3 @@ def arg_parsing():
 
 def main():
     arg_parsing()
-
-if __name__ == "__main__":
-    main()
