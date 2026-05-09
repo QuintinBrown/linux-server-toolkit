@@ -13,7 +13,8 @@ class Plugin(BasePlugin):
             "Ping DNS": self.ping_dns,
             "Test DNS": self.test_dns,
             "Find Gateway": self.find_gateway,
-            "Find DNS": self.find_dns
+            "Find DNS": self.find_dns,
+            "Find IP": self.find_ip
         }
     
     def run(self, cmd):
@@ -49,7 +50,15 @@ class Plugin(BasePlugin):
         print(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def ping_remote(self):
-        print("TODO: Ping Remote")
+        print("Pinging 8.8.8.8...")
+
+        command_result = self.run(f"ping 8.8.8.8 -c 5")
+        sent_search = re.search(r'([0-9])\b\spackets', command_result)
+        succeeded_search = re.search(r'([0-9])\b\sreceived', command_result)
+        sent = sent_search.group(1)
+        succeeded = succeeded_search.group(1)
+
+        print(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def ping_dns(self):
         dns = self.find_dns(False)
@@ -63,4 +72,17 @@ class Plugin(BasePlugin):
         print(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def test_dns(self):
-        print("TODO: Test DNS")
+        print("Pinging www.google.com...")
+
+        command_result = self.run(f"ping www.google.com -c 5")
+        sent_search = re.search(r'([0-9])\b\spackets', command_result)
+        succeeded_search = re.search(r'([0-9])\b\sreceived', command_result)
+        sent = sent_search.group(1)
+        succeeded = succeeded_search.group(1)
+
+        print(f"{sent} pings sent, {succeeded} pings succeeded")
+
+    def find_ip(self):
+        result = self.run("ip route")
+        pretty_result = re.search(r'\bsrc\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', result)
+        print(pretty_result.group(1))
