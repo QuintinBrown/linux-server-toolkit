@@ -55,7 +55,7 @@ def plugin_menu(plugin):
 
         # clears and runs the command, checks the return result and prints it
         clear()
-        print(f"Running: {command_name}")
+        print(f"Running: {command_name}\n")
 
         result = command_func()
 

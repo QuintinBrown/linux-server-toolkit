@@ -1,4 +1,5 @@
 import subprocess
+import pty
 
 from server_toolkit_app.base_plugin import BasePlugin
 
@@ -22,13 +23,18 @@ class Plugin(BasePlugin):
         return result.stdout.strip()
     
     def list_containers(self):
-        return "TODO: List Containers"
+        return self.run("sudo docker ps")
     
     def restart_unhealthy(self):
-        return "TODO: Restart Unealthy Containers"
+        return self.run("sudo docker ps --filter \"health=unhealthy\" | xargs -r docker restart")
     
     def start_shell(self):
-        return "TODO: Start Exec Shell"
+        print("The currently running containers are:\n")
+        print(self.list_containers())
+        container = input("\nWhich would you like to start a shell inside? ")
+        exec_cmd = ["sudo", "docker", "exec", "-it", container, "/bin/bash"]
+        pty.spawn(exec_cmd)
+        return
     
     def container_stats(self):
         return "TODO: Container Stats"
