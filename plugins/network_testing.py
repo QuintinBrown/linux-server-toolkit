@@ -28,8 +28,15 @@ class Plugin(BasePlugin):
             return pretty_result.group(1)
     
     def ping_gateway(self):
-        print("TODO: Ping Gateway")
+        gw = self.find_gateway(False)
+        print("Pinging gateway...")
+        command_result = self.run(f"ping {gw} -c 5")
+        sent_search = re.search(r'([0-9])\b\spackets', command_result)
+        succeeded_search = re.search(r'([0-9])\b\sreceived', command_result)
+        sent = sent_search.group(1)
+        succeeded = succeeded_search.group(1)
 
+        print(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def ping_remote(self):
         print("TODO: Ping Remote")
