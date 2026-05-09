@@ -37,6 +37,7 @@ def plugin_menu(plugin):
             quit()
 
         if command_choice.lower() == "b":
+            clear()
             return
         
         try:
