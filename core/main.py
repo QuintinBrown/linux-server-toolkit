@@ -10,7 +10,7 @@ def fatal(error):
     exit(1)
 
 def error(description):
-    print(f"[ERROR] {description}")
+    print(f"[ERROR] {description}\n")
 
 def quit():
     exit(0)
@@ -42,11 +42,13 @@ def plugin_menu(plugin):
         try:
             command_index = int(command_choice) - 1
         except ValueError:
-            error("Invalid command option {command_choice}")
+            clear()
+            error(f"Invalid command option {command_choice}")
             continue
 
         if command_index < 0 or command_index > len(commands):
-            error("Invalid command option {command_choice}")
+            clear()
+            error(f"Invalid command option {command_choice}")
             continue
 
         command_name, command_func = command_items[command_index]
@@ -73,7 +75,7 @@ def start_CLI():
 
         print("q. Quit")
 
-        plugin_choice = input("\n Select plugin ").strip()
+        plugin_choice = input("\nSelect plugin ").strip()
 
         if plugin_choice.lower() == "q":
             quit()
@@ -81,11 +83,13 @@ def start_CLI():
         try:
             plugin_index = int(plugin_choice) - 1
         except ValueError:
-            error("Invalid plugin option {plugin_choice}")
+            clear()
+            error(f"Invalid plugin option {plugin_choice}")
             continue
 
         if plugin_index < 0 or plugin_index > len(plugins):
-            error("Invalid plugin option {plugin_choice}")
+            clear()
+            error(f"Invalid plugin option {plugin_choice}")
             continue
 
         selected_plugin = plugins[plugin_index]
