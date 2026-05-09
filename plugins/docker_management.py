@@ -43,7 +43,12 @@ class Plugin(BasePlugin):
         return "TODO: Clean Dangling Images"
     
     def clean_volumes(self):
-        return "TODO: Clean Dangling Volumes"
+        print("The empty volumes are\n")
+        print(self.run("sudo docker volume ls --filter \"dangling=true\""))
+        print()
+        prune_command = ["sudo", "docker", "volume", "prune"]
+        pty.spawn(prune_command)
+        return
     
     def compose_stack(self):
         return "TODO: Compose Stack Status"
