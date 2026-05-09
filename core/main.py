@@ -97,7 +97,7 @@ def start_TUI():
 def arg_parsing():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--cli", help="Launch CLI mode", action="store_true")
-    parser.add_argument("-t", "--tui", help="Launch TUI mode", action="store_false")
+    parser.add_argument("-t", "--tui", help="Launch TUI mode", action="store_true")
 
     parser.add_argument("--plugin", help="Specify plugin that tool is from")
     parser.add_argument("--tool", help="Specify tool from plugin to run in terminal")
