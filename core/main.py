@@ -61,7 +61,7 @@ def plugin_menu(plugin):
         if result is not None:
             print(result)
         
-        input("\n Press Enter to continue...")
+        input("\nPress Enter to continue...")
         clear()
 
 def start_CLI():
