@@ -47,7 +47,7 @@ class Plugin(BasePlugin):
         sent = sent_search.group(1)
         succeeded = succeeded_search.group(1)
 
-        print(f"{sent} pings sent, {succeeded} pings succeeded")
+        return(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def ping_remote(self):
         print("Pinging 8.8.8.8...")
@@ -58,7 +58,7 @@ class Plugin(BasePlugin):
         sent = sent_search.group(1)
         succeeded = succeeded_search.group(1)
 
-        print(f"{sent} pings sent, {succeeded} pings succeeded")
+        return(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def ping_dns(self):
         dns = self.find_dns(False)
@@ -69,7 +69,7 @@ class Plugin(BasePlugin):
         sent = sent_search.group(1)
         succeeded = succeeded_search.group(1)
 
-        print(f"{sent} pings sent, {succeeded} pings succeeded")
+        return(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def test_dns(self):
         print("Pinging www.google.com...")
@@ -80,9 +80,9 @@ class Plugin(BasePlugin):
         sent = sent_search.group(1)
         succeeded = succeeded_search.group(1)
 
-        print(f"{sent} pings sent, {succeeded} pings succeeded")
+        return(f"{sent} pings sent, {succeeded} pings succeeded")
 
     def find_ip(self):
         result = self.run("ip route")
         pretty_result = re.search(r'\bsrc\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', result)
-        print(pretty_result.group(1))
+        return(pretty_result.group(1))

@@ -3,6 +3,7 @@
 from core.plugin_loader import load_plugins
 
 import argparse
+import subprocess
 
 def fatal(error):
     print(f"[FATAL] {error}")
@@ -14,41 +15,84 @@ def error(description):
 def quit():
     exit(0)
 
+def clear():
+    subprocess.run('clear')
+
+def plugin_menu(plugin):
+    clear()
+    commands = plugin.commands()
+    command_items = list(commands.items())
+
+    while True:
+        print(f"[{plugin.name}]")
+
+        for idx, (command_name, _) in enumerate(command_items, start=1):
+            print(f"{idx}. {command_name}")
+        print("b. Back to plugin selection")
+        print("q. Quit")
+
+        command_choice = input("\nSelect a tool ").strip()
+
+        if command_choice.lower() == "q":
+            quit()
+
+        if command_choice.lower() == "b":
+            return
+        
+        try:
+            command_index = int(command_choice) - 1
+        except ValueError:
+            error("Invalid command option {command_choice}")
+            continue
+
+        if command_index < 0 or command_index > len(commands):
+            error("Invalid command option {command_choice}")
+            continue
+
+        command_name, command_func = command_items[command_index]
+
+        clear()
+        print(f"Running: {command_name}")
+
+        result = command_func()
+
+        if result is not None:
+            print(result)
+        
+        input("\n Press Enter to continue...")
+        clear()
+
 def start_CLI():
-    print_plugins()
+    clear()
+    plugins = load_plugins()
+    while True:
+        print("Available plugins")
+
+        for idx, plugin in enumerate(plugins, start=1):
+            print(f"{idx}. {plugin.name}")
+
+        print("q. Quit")
+
+        plugin_choice = input("\n Select plugin ").strip()
+
+        if plugin_choice.lower() == "q":
+            quit()
+        
+        try:
+            plugin_index = int(plugin_choice) - 1
+        except ValueError:
+            error("Invalid plugin option {plugin_choice}")
+            continue
+
+        if plugin_index < 0 or plugin_index > len(plugins):
+            error("Invalid plugin option {plugin_choice}")
+            continue
+
+        selected_plugin = plugins[plugin_index]
+        plugin_menu(selected_plugin)
 
 def start_TUI():
     print("TODO: TUI")
-
-def print_plugins():
-    plugins = load_plugins()
-
-    for plugin in plugins:
-        print(f"\n[{plugin.name}]")
-
-        commands = plugin.commands()
-
-        for idx, command in enumerate(commands):
-            print(f"{idx+1}. {command}")
-
-        option = input("\nSelect an option: ")
-
-        if option == "q":
-            quit()
-
-        try:
-            option = int(option)
-        except ValueError:
-            error("Invalid option")
-            return
-        
-        command_list = list(commands.items())
-        if option < 1 or option > len(command_list):
-            error("Invalid option")
-            return
-
-        command_name, command_func = command_list[option - 1]
-        command_func()
 
 def arg_parsing():
     parser = argparse.ArgumentParser()
