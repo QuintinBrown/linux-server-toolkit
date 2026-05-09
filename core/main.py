@@ -108,9 +108,10 @@ def arg_parsing():
     parser.add_argument("--tool", help="Specify tool from plugin to run in terminal")
 
     args = parser.parse_args()
-    if args.cli:
+    
+    if not args.tui:
         start_CLI()
-    elif args.tui:
+    else:
         start_TUI()
 
 def main():
