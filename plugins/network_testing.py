@@ -41,7 +41,7 @@ class Plugin(BasePlugin):
         return DNS_server.group(1)
     
     def ping_gateway(self):
-        gw = self.find_gateway(False)
+        gw = self.find_gateway()
         print("Pinging gateway...")
         return self.ping(gw)
 
@@ -50,7 +50,7 @@ class Plugin(BasePlugin):
         return self.ping("8.8.8.8")
 
     def ping_dns(self):
-        dns = self.find_dns(False)
+        dns = self.find_dns()
         print("Pinging DNS server...")
         return self.ping(dns)
 
