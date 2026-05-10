@@ -148,9 +148,17 @@ def draw_commands(win, plugin, selected_index, active):
     
     win.refresh()
 
-def draw_output(win):
+def draw_output(win, text=""):
     win.clear()
     win.box()
+    win.addstr(1, 1, "[Output]")
+
+    lines = str(text).splitlines() or [""]
+
+    max_y, max_x = win.getmaxyx()
+    for idx, line in enumerate(lines[: max_y - 3]):
+        win.addstr(idx + 2, 1, line[: max_x - 2])
+    
     win.refresh()
 
 def curses_main(stdscr):
@@ -196,6 +204,7 @@ def curses_main(stdscr):
     active_pane = "plugins"
     plugin_index = 0
     commands_index = 0
+    output = ""
 
     selected_plugin = plugins[plugin_index]
     
@@ -225,13 +234,21 @@ def curses_main(stdscr):
                 commands_index = 0
             else:
                 commands_index = min(len(command_items) - 1, commands_index + 1)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            if active_pane == "commands" and command_items:
+                command_name, command_func = command_items[commands_index]
+                try:
+                    result = command_func()
+                except Exception as exc:
+                    result = error(f"{command_name}: {exc}")
+                
+                draw_output(output_win, result)
         else:
             continue
 
         selected_plugin = plugins[plugin_index]
         draw_plugins(plugins_win, plugins, plugin_index, active_pane == "plugins")
         draw_commands(commands_win, selected_plugin, commands_index, active_pane == "commands")
-
 def start_TUI():
     curses.wrapper(curses_main)
 
