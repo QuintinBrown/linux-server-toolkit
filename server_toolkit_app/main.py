@@ -135,11 +135,31 @@ def curses_main(stdscr):
                                 output_begin_x
                             )
 
+    plugins = load_plugins()
+
     plugins_win.box()
-    plugins_win.addstr(1, 1, "Press q to quit")
+
+    plugins_win.addstr(1, 1, "Available Plugins:")
+
+    for idx, plugin in enumerate(plugins, start=1):
+            plugins_win.addstr(idx + 1, 1, f"{idx}. {plugin.name}")
+    
+    plugins_win.addstr(len(plugins) + 2, 1, "q. quit")
+
     plugins_win.refresh()
 
+    selected_plugin = plugins[1]
+    commands = selected_plugin.commands()
+    command_items = list(commands.items())
+
     commands_win.box()
+
+    commands_win.addstr(1, 1, f"[{plugin.name}]")
+    for idx, (command_name, _) in enumerate(command_items, start=1):
+        commands_win.addstr(idx + 1, 1, f"{idx}. {command_name}")
+    
+    commands_win.addstr(len(command_items) + 1, 1, "b. Back to plugin selection")
+    commands_win.addstr(len(command_items) + 2, 1, "q. Quit")
     commands_win.refresh()
 
     output_win.box()
