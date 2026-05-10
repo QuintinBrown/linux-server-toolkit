@@ -30,22 +30,15 @@ class Plugin(BasePlugin):
 
         return(f"{sent} pings sent, {succeeded} pings succeeded")
 
-    def find_gateway(self, want_printed=True):
+    def find_gateway(self):
         result = self.run("ip route")
         pretty_result = re.search(r'\bvia\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', result)
-        if want_printed:
-            print(pretty_result.group(1))
-        else:
-            return pretty_result.group(1)
+        return pretty_result.group(1)
         
-    def find_dns(self, want_printed=True):
+    def find_dns(self):
         result = self.run("resolvectl status")
         DNS_server = re.search(r'\bCurrent DNS Server:\s([0-9]+.[0-9]+.[0-9]+.[0-9]+)', result)
-
-        if want_printed:
-            print(DNS_server.group(1))
-        else:
-            return DNS_server.group(1)
+        return DNS_server.group(1)
     
     def ping_gateway(self):
         gw = self.find_gateway(False)
