@@ -223,6 +223,7 @@ def curses_main(stdscr):
     draw_commands(commands_win, selected_plugin, commands_index, active_pane == "commands")
     draw_output(output_win)
     
+    # handle input in TUI mode
     while True:
         key = stdscr.getch()
 
@@ -231,24 +232,29 @@ def curses_main(stdscr):
 
         if key == ord('q'):
             break
-        elif key == ord('\t'):
+
+        elif key == ord('\t'): # swap panes on tab
             active_pane = "commands" if active_pane == "plugins" else "plugins"
+
         elif key == curses.KEY_UP:
             if active_pane == "plugins":
                 plugin_index = max(0, plugin_index - 1)
                 commands_index = 0
             else:
                 commands_index = max(0, commands_index - 1)
+        
         elif key == curses.KEY_DOWN:
             if active_pane == "plugins":
                 plugin_index = min(len(plugins) - 1, plugin_index + 1)
                 commands_index = 0
             else:
                 commands_index = min(len(command_items) - 1, commands_index + 1)
+
         elif key in (curses.KEY_ENTER, 10, 13):
             if active_pane == "commands" and command_items:
                 command_name, command_spec = command_items[commands_index]
                 
+                # plugin methods shouldn't necessarily need to specify they are not interactive
                 if isinstance(command_spec, dict):
                     command_func =  command_spec["func"]
                     needs_terminal = command_spec.get("interactive", False)
@@ -260,6 +266,7 @@ def curses_main(stdscr):
                 draw_output(output_win)
 
                 try:
+                    # go to a clear terminal if the plugin method is interactive
                     if needs_terminal:
                         curses.nocbreak()
                         stdscr.keypad(False)
@@ -270,6 +277,7 @@ def curses_main(stdscr):
                         try:
                             result = command_func()
                             input("\nPress Enter to return to the TUI")
+                        # reset back to TUI mode
                         finally:
                             curses.noecho()
                             curses.cbreak()
@@ -279,7 +287,8 @@ def curses_main(stdscr):
 
                         output_lines.clear()
                         curses_output(f"Returned from: {command_name}")
-                    else:
+
+                    else: # run as normal if it isnt interactive
                         curses_output(f"Running: {command_name}")
 
                         result = command_func()
