@@ -199,7 +199,13 @@ def curses_main(stdscr):
                                 output_begin_x
                             )
 
-    plugins = load_plugins()
+    output_lines = []
+
+    def curses_output(text):
+        output_lines.append(str(text))
+        draw_output(output_win, "\n".join(output_lines))
+
+    plugins = load_plugins(output_func=curses_output)
     
     active_pane = "plugins"
     plugin_index = 0
@@ -237,18 +243,25 @@ def curses_main(stdscr):
         elif key in (curses.KEY_ENTER, 10, 13):
             if active_pane == "commands" and command_items:
                 command_name, command_func = command_items[commands_index]
+                output_lines.clear()
+                draw_output(output_win)
+                curses_output(f"Running: {command_name}")
                 try:
                     result = command_func()
+
+                    if result is not None:
+                        curses_output(result)
+
                 except Exception as exc:
-                    result = error(f"{command_name}: {exc}")
+                    curses_output(f"[ERROR] {exc}")
                 
-                draw_output(output_win, result)
         else:
             continue
 
         selected_plugin = plugins[plugin_index]
         draw_plugins(plugins_win, plugins, plugin_index, active_pane == "plugins")
         draw_commands(commands_win, selected_plugin, commands_index, active_pane == "commands")
+
 def start_TUI():
     curses.wrapper(curses_main)
 

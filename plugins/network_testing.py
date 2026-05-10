@@ -19,7 +19,12 @@ class Plugin(BasePlugin):
     
     def run(self, cmd):
         result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+        if result.returncode != 0:
+            raise Exception(result.stderr.strip())
+
         return result.stdout.strip()
+
     
     def ping(self, dest, count=5):
         command_result = self.run(f"ping {dest} -c {count}")
@@ -42,20 +47,20 @@ class Plugin(BasePlugin):
     
     def ping_gateway(self):
         gw = self.find_gateway()
-        print("Pinging gateway...")
+        self.output("Pinging gateway...")
         return self.ping(gw)
 
     def ping_remote(self):
-        print("Pinging 8.8.8.8...")
+        self.output("Pinging 8.8.8.8...")
         return self.ping("8.8.8.8")
 
     def ping_dns(self):
         dns = self.find_dns()
-        print("Pinging DNS server...")
+        self.output("Pinging DNS server...")
         return self.ping(dns)
 
     def test_dns(self):
-        print("Pinging www.google.com...")
+        self.output("Pinging www.google.com...")
         return self.ping("www.google.com")
 
     def find_ip(self):
