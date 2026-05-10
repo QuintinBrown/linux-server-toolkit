@@ -8,13 +8,13 @@ class Plugin(BasePlugin):
 
     def commands(self):
         return {
-            "Ping Gateway": self.ping_gateway,
-            "Remote Ping": self.ping_remote,
-            "Ping DNS": self.ping_dns,
-            "Test DNS": self.test_dns,
-            "Find Gateway": self.find_gateway,
-            "Find DNS": self.find_dns,
-            "Find IP": self.find_ip
+            "Ping Gateway": {"func": self.ping_gateway, "interactive": False},
+            "Remote Ping": {"func": self.ping_remote, "interactive": False},
+            "Ping DNS": {"func": self.ping_dns, "interactive": False},
+            "Test DNS": {"func": self.test_dns, "interactive": False},
+            "Find Gateway": {"func": self.find_gateway, "interactive": False},
+            "Find DNS": {"func": self.find_dns, "interactive": False},
+            "Find IP": {"func": self.find_ip, "interactive": False}
         }
     
     def run(self, cmd):
@@ -24,7 +24,6 @@ class Plugin(BasePlugin):
             raise Exception(result.stderr.strip())
 
         return result.stdout.strip()
-
     
     def ping(self, dest, count=5):
         command_result = self.run(f"ping {dest} -c {count}")

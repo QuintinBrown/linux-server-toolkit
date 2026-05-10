@@ -127,7 +127,7 @@ def draw_commands(win, plugin, selected_index, active):
     win.box()
 
     commands = plugin.commands()
-    command_items = list(commands.items())
+    command_items = list(plugin.commands().items())
 
     if active:
         win.attron(curses.A_REVERSE)
@@ -136,8 +136,12 @@ def draw_commands(win, plugin, selected_index, active):
     else:
         win.addstr(1, 1, f"[{plugin.name}]")
 
-    for idx, (command_name, _) in enumerate(command_items):
-        line = f"{idx + 1}. {command_name}"
+    for idx, (command_name, command_spec) in enumerate(command_items):
+        is_interactive = (
+            isinstance(command_spec, dict) and command_spec.get("interactive", False)
+        )
+        suffix = " *" if is_interactive else ""
+        line = f"{idx + 1}. {command_name}{suffix}"
 
         if idx == selected_index:
             win.attron(curses.A_REVERSE)
@@ -204,9 +208,9 @@ def curses_main(stdscr):
     def curses_output(text):
         output_lines.append(str(text))
         draw_output(output_win, "\n".join(output_lines))
-
-    plugins = load_plugins(output_func=curses_output)
     
+    plugins = load_plugins(output_func=curses_output)
+
     active_pane = "plugins"
     plugin_index = 0
     commands_index = 0
@@ -242,15 +246,45 @@ def curses_main(stdscr):
                 commands_index = min(len(command_items) - 1, commands_index + 1)
         elif key in (curses.KEY_ENTER, 10, 13):
             if active_pane == "commands" and command_items:
-                command_name, command_func = command_items[commands_index]
+                command_name, command_spec = command_items[commands_index]
+                
+                if isinstance(command_spec, dict):
+                    command_func =  command_spec["func"]
+                    needs_terminal = command_spec.get("interactive", False)
+                else:
+                    command_func = command_spec
+                    needs_terminal = False
+                
                 output_lines.clear()
                 draw_output(output_win)
-                curses_output(f"Running: {command_name}")
-                try:
-                    result = command_func()
 
-                    if result is not None:
-                        curses_output(result)
+                try:
+                    if needs_terminal:
+                        curses.nocbreak()
+                        stdscr.keypad(False)
+                        curses.echo()
+                        curses.endwin()
+                        clear()
+
+                        try:
+                            result = command_func()
+                            input("\nPress Enter to return to the TUI")
+                        finally:
+                            curses.noecho()
+                            curses.cbreak()
+                            stdscr.keypad(True)
+                            stdscr.clear()
+                            stdscr.refresh()
+
+                        output_lines.clear()
+                        curses_output(f"Returned from: {command_name}")
+                    else:
+                        curses_output(f"Running: {command_name}")
+
+                        result = command_func()
+
+                        if result is not None:
+                            curses_output(result)
 
                 except Exception as exc:
                     curses_output(f"[ERROR] {exc}")
