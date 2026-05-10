@@ -17,10 +17,14 @@ class Plugin(BasePlugin):
             "Find IP": {"func": self.find_ip, "interactive": False}
         }
     
+    def get_error_code(self, cmd):
+        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return result.returncode
+
     def run(self, cmd):
         result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
-        if result.returncode != 0:
+        if self.get_error_code(cmd) != 0:
             raise Exception(result.stderr.strip())
 
         return result.stdout.strip()
@@ -40,8 +44,13 @@ class Plugin(BasePlugin):
         return pretty_result.group(1)
         
     def find_dns(self):
-        result = self.run("resolvectl status")
-        DNS_server = re.search(r'\bCurrent DNS Server:\s([0-9]+.[0-9]+.[0-9]+.[0-9]+)', result)
+        if self.get_error_code("resolvectl status") == 0:
+            result = self.run("resolvectl status")
+            DNS_server = re.search(r'\bCurrent DNS Server:\s([0-9]+.[0-9]+.[0-9]+.[0-9]+)', result)
+        else:
+            result = self.run("cat /etc/resolv.conf")
+            DNS_server = re.search(r'\bnameserver\s([0-9]+.[0-9]+.[0-9]+.[0-9]+)', result)
+        
         return DNS_server.group(1)
     
     def ping_gateway(self):

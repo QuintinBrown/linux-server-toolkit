@@ -12,6 +12,12 @@ class BasePlugin(ABC):
     def output(self, text):
         self.output_func(str(text))
 
+    def run(self, cmd):
+        pass
+
+    def get_error_code(self, cmd):
+        pass
+
     @abstractmethod
     def commands(self):
         pass

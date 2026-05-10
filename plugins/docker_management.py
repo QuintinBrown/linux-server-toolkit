@@ -51,15 +51,14 @@ class Plugin(BasePlugin):
     def clean_images(self):
         self.output("The dangling images are\n")
         self.output(self.run("sudo docker images -f \"dangling=true\""))
-        self.output()
         prune_image_command = ["sudo", "docker", "image", "prune", "-f"]
         pty.spawn(prune_image_command)
         return
     
     def clean_volumes(self):
         self.output("The dangling volumes are\n")
-        self.output(self.run("sudo docker volume ls --filter \"dangling=true\""))
-        self.output()
+        list = self.run("sudo docker volume ls --filter \"dangling=true\"")
+        self.output(list)
         prune_volume_command = ["sudo", "docker", "volume", "prune"]
         pty.spawn(prune_volume_command)
         return
