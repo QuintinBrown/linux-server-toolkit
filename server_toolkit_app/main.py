@@ -98,10 +98,44 @@ def start_CLI():
         selected_plugin = plugins[plugin_index]
         plugin_menu(selected_plugin) # run the plugin menu for the selected plugin
 
+def draw_plugins(win, plugins, selected_index):
+    win.clear()
+    win.box()
+
+    win.addstr(1, 1, "[Available Plugins]")
+
+    for idx, plugin in enumerate(plugins):
+        line = f"{idx + 1}. {plugin.name}"
+
+        if idx == selected_index:
+            win.attron(curses.A_REVERSE)
+            win.addstr(idx + 3, 1, line)
+            win.attroff(curses.A_REVERSE)
+        else:
+            win.addstr(idx + 3, 1, line)
+    
+    win.addstr(len(plugins) + 3, 1, "q. Quit")
+    win.refresh()
+
+def draw_commands(win, plugin):
+    win.clear()
+    win.box()
+
+    commands = plugin.commands()
+    command_items = list(commands.items())
+
+    win.addstr(1, 1, f"[{plugin.name}]")
+
+    for idx, (command_name, _) in enumerate(command_items):
+        win.addstr(idx + 3, 1, f"{idx + 1}. {command_name}")
+    
+    win.refresh()
+
 def curses_main(stdscr):
     curses.curs_set(0)
     stdscr.clear()
     stdscr.refresh()
+    stdscr.keypad(True)
 
     plugins_begin_x = 2
     plugins_begin_y = 0
@@ -136,39 +170,25 @@ def curses_main(stdscr):
                             )
 
     plugins = load_plugins()
+    plugin_index = 0
 
-    plugins_win.box()
-
-    plugins_win.addstr(1, 1, "Available Plugins:")
-
-    for idx, plugin in enumerate(plugins, start=1):
-            plugins_win.addstr(idx + 1, 1, f"{idx}. {plugin.name}")
+    draw_plugins(plugins_win, plugins, plugin_index)
+    draw_commands(commands_win, plugins[plugin_index])
     
-    plugins_win.addstr(len(plugins) + 2, 1, "q. quit")
-
-    plugins_win.refresh()
-
-    selected_plugin = plugins[1]
-    commands = selected_plugin.commands()
-    command_items = list(commands.items())
-
-    commands_win.box()
-
-    commands_win.addstr(1, 1, f"[{plugin.name}]")
-    for idx, (command_name, _) in enumerate(command_items, start=1):
-        commands_win.addstr(idx + 1, 1, f"{idx}. {command_name}")
-    
-    commands_win.addstr(len(command_items) + 1, 1, "b. Back to plugin selection")
-    commands_win.addstr(len(command_items) + 2, 1, "q. Quit")
-    commands_win.refresh()
-
-    output_win.box()
-    output_win.refresh()
-
     while True:
-        ch = stdscr.getch()
-        if ch == ord('q'):
+        key = stdscr.getch()
+        if key == ord('q'):
             break
+        elif key == curses.KEY_UP:
+            plugin_index = max(0, plugin_index - 1)
+        elif key == curses.KEY_DOWN:
+            plugin_index = min(len(plugins) - 1, plugin_index + 1)
+        else:
+            continue
+
+        selected_plugin = plugins[plugin_index]
+        draw_plugins(plugins_win, plugins, plugin_index)
+        draw_commands(commands_win, selected_plugin)
 
 def start_TUI():
     curses.wrapper(curses_main)
