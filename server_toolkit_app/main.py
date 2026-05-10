@@ -52,7 +52,8 @@ def plugin_menu(plugin):
             error(f"Invalid command option {command_choice}")
             continue
 
-        command_name, command_func = command_items[command_index]
+        command_name, command_spec = command_items[command_index]
+        command_func =  command_spec["func"]
 
         # clears and runs the command, checks the return result and prints it
         clear()
