@@ -2,6 +2,7 @@ from server_toolkit_app.plugin_loader import load_plugins
 
 import argparse
 import subprocess
+import curses
 
 def fatal(error):
     print(f"[FATAL] {error}")
@@ -97,8 +98,60 @@ def start_CLI():
         selected_plugin = plugins[plugin_index]
         plugin_menu(selected_plugin) # run the plugin menu for the selected plugin
 
+def curses_main(stdscr):
+    curses.curs_set(0)
+    stdscr.clear()
+    stdscr.refresh()
+
+    plugins_begin_x = 2
+    plugins_begin_y = 0
+    plugins_height = curses.LINES - 20
+    plugins_width = curses.COLS // 3
+
+
+    plugins_win = curses.newwin(plugins_height, 
+                                plugins_width, 
+                                plugins_begin_y, 
+                                plugins_begin_x
+                            )
+    
+    commands_begin_x = plugins_begin_x + plugins_width + 1
+    commands_width = curses.COLS - commands_begin_x - 1
+    
+    commands_win = curses.newwin(plugins_height, 
+                                commands_width, 
+                                plugins_begin_y, 
+                                commands_begin_x
+                            )
+    
+    output_begin_x = 2
+    output_begin_y = plugins_height + plugins_begin_y
+    output_width = curses.COLS - output_begin_x - 1
+    output_height = curses.LINES - output_begin_y
+
+    output_win = curses.newwin(output_height, 
+                                output_width, 
+                                output_begin_y, 
+                                output_begin_x
+                            )
+
+    plugins_win.box()
+    plugins_win.addstr(1, 1, "Press q to quit")
+    plugins_win.refresh()
+
+    commands_win.box()
+    commands_win.refresh()
+
+    output_win.box()
+    output_win.refresh()
+
+    while True:
+        ch = stdscr.getch()
+        if ch == ord('q'):
+            break
+
 def start_TUI():
-    print("TODO: TUI")
+    curses.wrapper(curses_main)
 
 def arg_parsing():
     parser = argparse.ArgumentParser()
