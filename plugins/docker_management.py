@@ -30,7 +30,7 @@ class Plugin(BasePlugin):
         return self.run("sudo docker ps")
     
     def restart_unhealthy(self):
-        return self.run("sudo docker ps --filter \"health=unhealthy\" | xargs -r docker restart")
+        return self.run("sudo docker ps -q --filter \"health=unhealthy\" | xargs -r docker restart")
     
     def start_shell(self):
         print("The currently running containers are:\n")
