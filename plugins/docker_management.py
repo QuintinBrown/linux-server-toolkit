@@ -12,8 +12,8 @@ class Plugin(BasePlugin):
             "Restart Unhealthy Containers": {"func": self.restart_unhealthy, "interactive": False},
             "Start Container Exec Shell": {"func": self.start_shell, "interactive": True},
             "Container Stats": {"func": self.container_stats, "interactive": False},
-            "Clean Dangling Images": {"func": self.clean_images, "interactive": False},
-            "Clean Dangling Volumes": {"func": self.clean_volumes, "interactive": False},
+            "Clean Dangling Images": {"func": self.clean_images, "interactive": True},
+            "Clean Dangling Volumes": {"func": self.clean_volumes, "interactive": True},
             "Compose Stack Status": {"func": self.compose_stack, "interactive": False},
             "View Logs": {"func": self.view_logs, "interactive": False}
         }
@@ -49,19 +49,17 @@ class Plugin(BasePlugin):
         return "TODO: Container Stats"
     
     def clean_images(self):
-        self.output("The dangling images are\n")
-        self.output(self.run("sudo docker images -f \"dangling=true\""))
+        print("The dangling images are\n")
+        print(self.run("sudo docker images -f \"dangling=true\""))
         prune_image_command = ["sudo", "docker", "image", "prune", "-f"]
         pty.spawn(prune_image_command)
-        return
     
     def clean_volumes(self):
-        self.output("The dangling volumes are\n")
+        print("The dangling volumes are\n")
         list = self.run("sudo docker volume ls --filter \"dangling=true\"")
-        self.output(list)
+        print(list)
         prune_volume_command = ["sudo", "docker", "volume", "prune"]
         pty.spawn(prune_volume_command)
-        return
     
     def compose_stack(self):
         return "TODO: Compose Stack Status"
