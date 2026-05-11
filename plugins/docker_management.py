@@ -11,7 +11,7 @@ class Plugin(BasePlugin):
             "List All Containers": {"func": self.list_containers, "interactive": False},
             "Restart Unhealthy Containers": {"func": self.restart_unhealthy, "interactive": False},
             "Start Container Exec Shell": {"func": self.start_shell, "interactive": True},
-            "Container Stats": {"func": self.container_stats, "interactive": False},
+            "Container Stats": {"func": self.container_stats, "interactive": True},
             "Clean Dangling Images": {"func": self.clean_images, "interactive": True},
             "Clean Dangling Volumes": {"func": self.clean_volumes, "interactive": True},
             "Compose Stack Status": {"func": self.compose_stack, "interactive": False},
@@ -46,7 +46,8 @@ class Plugin(BasePlugin):
         pty.spawn(exec_cmd)
 
     def container_stats(self):
-        return "TODO: Container Stats"
+        stats_cmd = ["sudo", "docker", "stats"]
+        pty.spawn(stats_cmd)
     
     def clean_images(self):
         print("The dangling images are\n")
@@ -62,7 +63,7 @@ class Plugin(BasePlugin):
         pty.spawn(prune_volume_command)
     
     def compose_stack(self):
-        return "TODO: Compose Stack Status"
+        self.output(self.run("sudo docker config ls"))
     
     def view_logs(self):
         return "TODO: View Logs"
