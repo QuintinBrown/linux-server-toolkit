@@ -15,7 +15,7 @@ class Plugin(BasePlugin):
             "Clean Dangling Images": {"func": self.clean_images, "interactive": True},
             "Clean Dangling Volumes": {"func": self.clean_volumes, "interactive": True},
             "Compose Stack Status": {"func": self.compose_stack, "interactive": False},
-            "View Logs": {"func": self.view_logs, "interactive": False}
+            "View Logs": {"func": self.view_logs, "interactive": True}
         }
     
     def run(self, cmd):
@@ -66,4 +66,14 @@ class Plugin(BasePlugin):
         self.output(self.run("sudo docker config ls"))
     
     def view_logs(self):
-        return "TODO: View Logs"
+        print("The currently running containers are:\n")
+        print(self.list_containers())
+
+        container = input("\nWhich container would you like to view the logs of? ").strip()
+
+        if not container:
+            print("No container selected")
+            return
+        
+        stats_cmd = ["sudo", "docker", "logs", container]
+        pty.spawn(stats_cmd)
