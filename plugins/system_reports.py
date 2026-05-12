@@ -28,7 +28,40 @@ class Plugin(BasePlugin):
         return result.stdout.strip()
     
     def storage_report(self):
-        return "TODO: Storage Report"
+        date = self.run("date")
+        hostname = self.run("hostname")
+        domain_test = self.run("hostname -d")
+        domain = domain_test if domain_test else "None"
+        
+        disks_search = self.run("lsblk -i --output name,type").splitlines()
+        disk_names = []
+        for i in range(len(disks_search)):
+            cur_disk = re.search(r'(.+)\s+\bdisk', disks_search[i]) # find any name of type disk
+            if cur_disk: # if match is found, disk name formatted
+                cur_disk_name = cur_disk.group(1).strip()
+                if "ram" in cur_disk_name: # should avoid swap space being labeled as disk
+                    continue
+                else:
+                    disk_names.append(cur_disk_name)
+        
+        inode_usage = {} # Mount:{key} Usage:{inode_usage[key][0]} Filesystem:{inode_usage[key][1]}
+
+        inode_search = self.run("df -i").splitlines()
+        for i in range(len(inode_search)):
+            cur_line = inode_search[i].split()  
+            cur_fs = cur_line[0]
+            usage = cur_line[4]
+            mount_point = cur_line[-1]
+
+            inode_usage[mount_point] = (usage, cur_fs)
+
+        num_disks = len(disk_names)
+        root_disk = self.run("df -h / | tail -1")
+        root_total = root_disk[1]
+        root_used = root_disk[2]
+        root_free = root_disk[3]
+
+        return inode_usage
     
     def process_report(self):
         return "TODO: Process Report"
