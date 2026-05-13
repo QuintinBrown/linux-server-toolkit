@@ -1,5 +1,6 @@
 import subprocess
 import re
+from datetime import datetime as dt
 
 from server_toolkit_app.base_plugin import BasePlugin
 
@@ -56,12 +57,61 @@ class Plugin(BasePlugin):
             inode_usage[mount_point] = (usage, cur_fs)
 
         num_disks = len(disk_names)
-        root_disk = self.run("df -h / | tail -1")
+        root_disk = self.run("df -h / | tail -1").split()
         root_total = root_disk[1]
         root_used = root_disk[2]
         root_free = root_disk[3]
 
-        return inode_usage
+        SMART_health = {}
+        for i in range(len(disk_names)):
+            status_result = self.run(f"sudo smartctl -H /dev/{disk_names[i]}")
+            if "PASSED" in status_result:
+                SMART_health[disk_names[i]] = "PASSED"
+            else:
+                SMART_health[disk_names[i]] = "FAILED"
+
+        with open(f"storage_report_{hostname}_{dt.now().strftime("%G-%m-%d")}.log", "w", encoding="utf-8") as f:
+            f.write(f"Date: {date}\n")
+            f.write(f"Hostname: {hostname}\n")
+            f.write(f"Domain: {domain}\n")
+            f.write("\n")
+            f.write(f"Number of disks: {num_disks}\n")
+
+            for i in range(len(disk_names)):
+                f.write(f"Disk {i} {disk_names[i]}\n")
+            f.write("\n")
+            f.write(f"Root Drive Total: {root_total}\n")
+            f.write(f"Root Drive Used: {root_used}\n")
+            f.write(f"Root Drive Free: {root_free}\n")
+            f.write("\n")
+            f.write("Inode Usage\n")
+            f.write(
+                f"{'Filesystem':<20} | "
+                f"{'Inode Usage':<15} | "
+                f"{'Mount Point':<20}\n"
+            )
+
+            f.write("-" * 65 + "\n")
+
+            for key in inode_usage:
+                if key == "on":  # Skip header of cmd output
+                    continue
+
+                usage = inode_usage[key][0]
+                filesystem = inode_usage[key][1]
+
+                f.write(
+                    f"{filesystem:<20} | "
+                    f"{usage:<15} | "
+                    f"{key:<20}\n"
+                )
+
+            f.write("\n")
+            f.write("Smartctl Status\n")
+            for key in SMART_health:
+                f.write(f"Disk: {key} Status: {SMART_health[key]}\n")
+        
+        return f"Storage log written to: storage_log_{hostname}_{dt.now().strftime("%G-%m-%d")}.log"
     
     def process_report(self):
         return "TODO: Process Report"
